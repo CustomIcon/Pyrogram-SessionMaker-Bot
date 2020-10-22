@@ -20,10 +20,6 @@ async def phone_number(client, message):
     except IndexError:
         await message.reply('Must pass args, example: `/phone +1234578900`')
         return
-    await message.reply(
-        'Telegram will send you an activation code, Send it to me to get your session string',
-        reply_markup=ForceReply(True)
-        )
     try:
         await app.connect()
     except ConnectionError:
@@ -43,6 +39,9 @@ async def phone_number(client, message):
     await asyncio.sleep(15)
     try:
         signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
+    except KeyError:
+        await message.reply('timed out, try again')
+        return
     except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')
         return

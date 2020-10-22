@@ -31,16 +31,18 @@ async def phone_number(client, message):
     except errors.exceptions.bad_request_400.PhoneNumberInvalid:
         await message.reply('Phone number is invalid, Make sure you double check before sending.')
         return
-    await message.reply('send me your code in 10 seconds, make sure you reply to this message', reply_markup=ForceReply(True))
-    await asyncio.sleep(10)
+    await message.reply('send me your code in 20 seconds, make sure you reply to this message and wait for a response.', reply_markup=ForceReply(True))
+    await asyncio.sleep(20)
     try:
         await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     except KeyError:
-        await message.reply('timed out, try again')
+        await message.reply('Timed out, Try again.')
         return
     except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')
         return
+    except errors.exceptions.bad_request_400.PhoneCodeExpired:
+        await message.reply('The Code you sent seems Expired. Try again.')
     # if isinstance(signed_in, User):
     #     return signed_in
     await app.send_message('me', f'```{(await app.export_session_string())}```')

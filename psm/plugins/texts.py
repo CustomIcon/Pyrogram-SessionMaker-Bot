@@ -15,7 +15,7 @@ you can send me your phone number or token with a command
 helptext2 = """
 **📖 Help (2 of 2)**
 
-Telegram will send a code to you, with in 10 seconds make sure you send me the code
+Telegram will send a code to you, with in 20 seconds make sure you send me the code and wait for Bot to Respond.
 """
 
 tiptext1 = """
@@ -29,8 +29,4 @@ Since there will be Forks of this bot I suggest you to make your own one from So
 I (Pokurt) Personally made this for experimental purposes only, therefore the source is open.
 Your phone number and other confidential details are not saved,
 and make sure you clear the chat history of this bot if you do not trust and take a look at the Source itself.
-"""
-
-default_inline = """
-Inline message
 """

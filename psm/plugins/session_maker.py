@@ -23,7 +23,7 @@ async def phone_number(client, message):
     try:
         await app.connect()
     except ConnectionError:
-        await app.stop()
+        await app.disconnect()
         await message.reply('Try Again')
         return
     try:
@@ -31,12 +31,12 @@ async def phone_number(client, message):
     except FloodWait as e:
         await message.reply(f'I cannot create session for you.\nYou have a floodwait of: `{e.x}seconds``')
         return
-    code_sent = await message.reply('send me your code in 15 seconds, make sure you reply to this message', reply_markup=ForceReply(True))
+    await message.reply('send me your code in 15 seconds, make sure you reply to this message', reply_markup=ForceReply(True))
     await asyncio.sleep(15)
     try:
         signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     except KeyError:
-        await code_sent.edit('timed out, try again')
+        await message.reply('timed out, try again')
         return
     except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')

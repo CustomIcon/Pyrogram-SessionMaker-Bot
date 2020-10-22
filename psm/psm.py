@@ -13,10 +13,8 @@ class psm(Client):
         """Custom Pyrogram Client."""
         name = name.lower()
         config_file = f"{name}.ini"
-
         config = ConfigParser()
         config.read(config_file)
-
         plugins = dict(root=f"{name}.plugins", )
 
         super().__init__(

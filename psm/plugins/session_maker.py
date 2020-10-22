@@ -2,7 +2,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, User, TermsOfService, ForceReply
 from pyrogram import Client
 from pyrogram.errors import FloodWait
-import time
+import asyncio
 
 from psm import psm, config
 from psm.plugins.helpers import dynamic_data_filter
@@ -14,26 +14,26 @@ code_caches = dict()
 
 
 @psm.on_message(filters.command('phone'))
-def phone_number(client, message):
-    message.reply('Telegram will send you an activation code, Send it to me to get your session string', reply_markup=ForceReply(True))
+async def phone_number(client, message):
+    await message.reply('Telegram will send you an activation code, Send it to me to get your session string', reply_markup=ForceReply(True))
     try:
         phonenum = message.command[1]
     except IndexError:
-        message.reply('Must pass args, example: `/phone +1234578900')
+        await message.reply('Must pass args, example: `/phone +1234578900')
         return
-    app.connect()
+    await app.connect()
     try:
-        sent_code = app.send_code(phonenum)
+        sent_code = await app.send_code(phonenum)
     except FloodWait as e:
-        message.reply(f'I cannot create session for you.\nYou have a floodwait of: `{e.x}seconds``')
+        await message.reply(f'I cannot create session for you.\nYou have a floodwait of: `{e.x}seconds``')
         return
-    message.reply('send me your code in 20 seconds, make sure you reply to this message')
-    time.sleep(10)
-    signed_in = app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
+    await message.reply('send me your code in 20 seconds, make sure you reply to this message')
+    await asyncio.sleep(20)
+    signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     if isinstance(signed_in, User):
         return signed_in
-    message.reply(app.export_session_string())
-    app.stop()
+    await message.reply(app.export_session_string())
+    await app.stop()
 
 @psm.on_message(filters.private)
 async def code_save(client, message):

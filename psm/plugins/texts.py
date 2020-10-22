@@ -6,8 +6,8 @@ I can make session strings for you on the go
 
 helptext1 = """
 **📖 Help (1 of 2)**
-you can send me your phone number with a command
 
+you can send me your phone number with a command
 `/phone (phone number with country code)`
 """
 

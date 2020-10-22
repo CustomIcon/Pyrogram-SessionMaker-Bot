@@ -19,7 +19,16 @@ async def phone_number(client, message):
     except IndexError:
         await message.reply('Must pass args, example: `/phone +1234578900`')
         return
-    await app.connect()
+    await message.reply(
+        'Telegram will send you an activation code, Send it to me to get your session string',
+        reply_markup=ForceReply(True)
+        )
+    try:
+        await app.connect()
+    except ConnectionError:
+        await app.stop()
+        await message.reply('Try Again')
+        return
     try:
         sent_code = await app.send_code(phonenum)
         await message.reply(

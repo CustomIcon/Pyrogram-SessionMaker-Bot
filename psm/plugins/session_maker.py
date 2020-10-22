@@ -10,8 +10,7 @@ from psm.plugins.texts import helptext, helptext1, helptext2, tiptext1
 
 app = Client(":memory:", api_id=int(config.get('pyrogram', 'api_id')), api_hash=config.get('pyrogram', 'api_hash'))
 
-code_caches = dict()
-
+code_caches = {}
 
 @psm.on_message(filters.command('phone'))
 async def phone_number(client, message):
@@ -20,13 +19,13 @@ async def phone_number(client, message):
     except IndexError:
         await message.reply('Must pass args, example: `/phone +1234578900`')
         return
-    await message.reply(
-        'Telegram will send you an activation code, Send it to me to get your session string',
-        reply_markup=ForceReply(True)
-        )
     await app.connect()
     try:
         sent_code = await app.send_code(phonenum)
+        await message.reply(
+                'Telegram will send you an activation code, Send it to me to get your session string.)',
+                reply_markup=ForceReply(True)
+            )
     except FloodWait as e:
         await message.reply(f'I cannot create session for you.\nYou have a floodwait of: `{e.x}seconds``')
         return
@@ -48,7 +47,10 @@ async def phone_number(client, message):
 
 @psm.on_message(~filters.group, group=6)
 async def code_save(client, message):
-    if message.reply_to_message:
-        code_caches[message.from_user.id] = message.text
-    else:
-        return
+    try:
+        if message.reply_to_message:
+            code_caches[message.from_user.id] = message.text
+        else:
+            return
+    except KeyError:
+        await message.reply('Try using `/start` and read the instructions')

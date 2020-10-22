@@ -43,6 +43,7 @@ async def phone_number(client, message):
         return
     except errors.exceptions.bad_request_400.PhoneCodeExpired:
         await message.reply('The Code you sent seems Expired. Try again.')
+        return
     # if isinstance(signed_in, User):
     #     return signed_in
     await app.send_message('me', f'```{(await app.export_session_string())}```')

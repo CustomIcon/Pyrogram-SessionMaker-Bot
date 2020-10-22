@@ -28,19 +28,15 @@ async def phone_number(client, message):
         return
     try:
         sent_code = await app.send_code(phonenum)
-        await message.reply(
-                'Telegram will send you an activation code, Send it to me to get your session string.)',
-                reply_markup=ForceReply(True)
-            )
     except FloodWait as e:
         await message.reply(f'I cannot create session for you.\nYou have a floodwait of: `{e.x}seconds``')
         return
-    await message.reply('send me your code in 15 seconds, make sure you reply to this message')
+    code_sent = await message.reply('send me your code in 15 seconds, make sure you reply to this message', reply_markup=ForceReply(True))
     await asyncio.sleep(15)
     try:
         signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     except KeyError:
-        await message.reply('timed out, try again')
+        await code_sent.edit('timed out, try again')
         return
     except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')

@@ -24,8 +24,7 @@ async def phone_number(client, message):
         await app.connect()
     except ConnectionError:
         await app.disconnect()
-        await message.reply('Try Again')
-        return
+        await app.connect()
     try:
         sent_code = await app.send_code(phonenum)
     except FloodWait as e:

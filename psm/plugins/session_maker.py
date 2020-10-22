@@ -1,7 +1,8 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, User, TermsOfService, ForceReply
 from pyrogram import Client
-from pyrogram.errors import FloodWait, PhoneCodeInvalid, PhoneNumberInvalid
+from pyrogram.errors import FloodWait
+from pyrogram import errors
 import asyncio
 
 from psm import psm, config
@@ -42,10 +43,10 @@ async def phone_number(client, message):
     await asyncio.sleep(15)
     try:
         signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
-    except PhoneCodeInvalid:
+    except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')
         return
-    except PhoneNumberInvalid:
+    except errors.exceptions.bad_request_400.PhoneNumberInvalid:
         await message.reply('Phone number is invalid, Make sure you double check before sending.')
         return
     if isinstance(signed_in, User):

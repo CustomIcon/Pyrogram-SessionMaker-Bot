@@ -34,21 +34,42 @@ async def phone_number(client, message):
     await message.reply('send me your code in 10 seconds, make sure you reply to this message', reply_markup=ForceReply(True))
     await asyncio.sleep(10)
     try:
-        signed_in = await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
+        await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     except KeyError:
         await message.reply('timed out, try again')
         return
     except errors.exceptions.bad_request_400.PhoneCodeInvalid:
         await message.reply('The code you sent seems Invalid, Try again.')
         return
-    if isinstance(signed_in, User):
-        return signed_in
+    # if isinstance(signed_in, User):
+    #     return signed_in
     await app.send_message('me', f'```{(await app.export_session_string())}```')
     await app.stop()
     button = InlineKeyboardMarkup(
         [[InlineKeyboardButton('Go to Saved Messages', url=f'tg://user?id={message.from_user.id}')]]
     )
     await message.reply('All Done! Check your Saved Messages for your Session String.', reply_markup=button)
+
+
+@psm.on_message(filters.command('token'))
+async def bot_token(client, message):
+    try:
+        bottoken = message.text.split(None, 1)[1].replace(' ', '')
+    except IndexError:
+        await message.reply('Must pass args, example: `/token 1234:ABCD1234`')
+        return
+    try:
+        await app.connect()
+    except ConnectionError:
+        await app.disconnect()
+        await app.connect()
+    try:
+        await app.sign_in_bot(bottoken)
+    except errors.exceptions.bad_request_400.AccessTokenInvalid:
+        await message.reply('BotToken Invalid: make sure you are sending a valid BotToken from @BotFather')
+        return
+    await message.reply(f'**Here is your Bot Session:** ```{(await app.export_session_string())}```')
+
 
 @psm.on_message(~filters.group, group=6)
 async def code_save(client, message):

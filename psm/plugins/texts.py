@@ -24,7 +24,7 @@ helptext2 = """
 **📖 Help (2 of 3)**
 
 Use `/clear` after you are done with Creating sessions.
-Use `/variable` to check your cached Variables.
+Use `/variables` to check your cached Variables.
 """
 helptext3 = """
 **📖 Help (3 of 3)**

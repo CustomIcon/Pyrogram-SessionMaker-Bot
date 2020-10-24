@@ -3,9 +3,9 @@ from configparser import ConfigParser
 from pyrogram import Client
 
 
-API_ID = environ.get('API_ID', None)
-API_HASH = environ.get('API_HASH', None)
-TOKEN = environ.get('TOKEN', None)
+API_ID = environ.get("API_ID", None)
+API_HASH = environ.get("API_HASH", None)
+TOKEN = environ.get("TOKEN", None)
 
 
 class psm(Client):
@@ -15,13 +15,15 @@ class psm(Client):
         config_file = f"{name}.ini"
         config = ConfigParser()
         config.read(config_file)
-        plugins = dict(root=f"{name}.plugins", )
+        plugins = dict(
+            root=f"{name}.plugins",
+        )
 
         super().__init__(
             name,
             api_id=API_ID,
             api_hash=API_HASH,
-            bot_token=TOKEN or config.get('pyrogram', 'token'),
+            bot_token=TOKEN or config.get("pyrogram", "token"),
             config_file=config_file,
             workers=16,
             plugins=plugins,

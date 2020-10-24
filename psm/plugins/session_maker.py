@@ -1,11 +1,11 @@
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, User, TermsOfService, ForceReply
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, TermsOfService, ForceReply
 from pyrogram import Client
 from pyrogram.errors import FloodWait
 from pyrogram import errors
 import asyncio
 
-from psm import psm, config
+from psm import psm
 from psm.plugins.dictionaries import code_caches, app_ids, app_hashs, passwords
 
 
@@ -17,7 +17,7 @@ async def client_session(message):
     )
 
 @psm.on_message(filters.command('phone'))
-async def phone_number(client, message):
+async def phone_number(_, message):
     try:
         app = await client_session(message)
     except KeyError:
@@ -71,7 +71,7 @@ async def phone_number(client, message):
 
 
 @psm.on_message(filters.command('token'))
-async def bot_token(client, message):
+async def bot_token(_, message):
     try:
         app = await client_session(message)
     except KeyError:

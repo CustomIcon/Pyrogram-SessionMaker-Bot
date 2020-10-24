@@ -50,7 +50,7 @@ async def checkpass(client, message):
 
 
 @psm.on_message(filters.command('clear'))
-async def clear_dict(client, message):
+async def clear_dict(_, message):
     code_caches.pop(message.from_user.id, None)
     m = await message.reply('checking and clearing saved verification codes.')
     await asyncio.sleep(3)

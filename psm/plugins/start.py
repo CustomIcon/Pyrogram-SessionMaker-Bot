@@ -1,5 +1,3 @@
-import re
-
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -29,6 +27,7 @@ async def help_button1(_, query):
     await query.message.edit(helptext2, reply_markup=InlineKeyboardMarkup(buttons))
     await query.answer()
 
+
 @psm.on_callback_query(dynamic_data_filter("help_3"))
 async def help_button2(_, query):
     buttons = [
@@ -36,6 +35,7 @@ async def help_button2(_, query):
         InlineKeyboardButton('Next', callback_data='tip_1')]]
     await query.message.edit(helptext3, reply_markup=InlineKeyboardMarkup(buttons))
     await query.answer()
+
 
 @psm.on_callback_query(dynamic_data_filter("tip_1"))
 async def tip_button1(_, query):

@@ -1,0 +1,2 @@
+# Pyrogram-SessionMaker-Bot
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e81968575dc54087b1472ef7565cb8e9)](https://app.codacy.com/gh/pokurt/Pyrogram-SessionMaker-Bot?utm_source=github.com&utm_medium=referral&utm_content=pokurt/Pyrogram-SessionMaker-Bot&utm_campaign=Badge_Grade)

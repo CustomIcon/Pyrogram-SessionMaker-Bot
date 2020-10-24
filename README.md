@@ -13,7 +13,7 @@ This project is free to use for Creating Sessions. If you Intend to use this pro
 You are not welcome to be here or use the Project.
 
 ### Requirments
--  See `requirments.txt` in root directory of the Project
+-  See `requirements.txt` in root directory of the Project
 -  We do not need much of requirements other than `Pyrogram` and `TgCrypto`
 
 ### Setup

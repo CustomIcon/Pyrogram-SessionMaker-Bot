@@ -21,7 +21,7 @@ async def check_vars(client, message):
         text += '**PASSWORD**: `None`\n'
 
     try:
-        text += f'**VALIDATE_CODE**:`{code_caches[message.from_user.id]}`'
+        text += f'**VALIDATE_CODE**: `{code_caches[message.from_user.id]}`'
     except KeyError:
         text += '**VALIDATE_CODE**: `None`'
     

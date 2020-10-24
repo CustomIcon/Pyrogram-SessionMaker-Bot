@@ -44,8 +44,7 @@ async def phone_number(client, message):
     await message.reply('send me your code in 25 seconds, make sure you reply to this message and wait for a response.', reply_markup=ForceReply(True))
     await asyncio.sleep(25)
     try:
-        final_code = '-'.join(str(code_caches[message.from_user.id]))
-        await app.sign_in(phonenum, sent_code.phone_code_hash, final_code)
+        await app.sign_in(phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id])
     except KeyError:
         await message.reply('Timed out, Try again.')
         return

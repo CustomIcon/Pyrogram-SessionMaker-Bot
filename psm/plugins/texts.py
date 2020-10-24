@@ -29,8 +29,10 @@ Use `/variables` to check your cached Variables.
 helptext3 = """
 **📖 Help (3 of 3)**
 
-Telegram will send validation code to you,
+Telegram will send validation to you,
 with in 25 seconds make sure you send me the code and wait for Bot to Respond.
+
+**MAKE SURE** to type validation code in this format: `1-2-3-4-5` and not `12345`
 """
 
 tiptext1 = """

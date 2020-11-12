@@ -15,8 +15,17 @@ async def client_session(message, api_id, api_hash):
 @psm.on_message(filters.command("proceed") | ~filters.command("start"))
 async def sessions_make(client, message):
     apid = await client.ask(message.chat.id, strings.APIID)
+    if apid.text.startswith('/'):
+        await message.reply(strings.CANCEL)
+        return
     aphash = await client.ask(message.chat.id, strings.APIHASH)
+    if aphash.text.startswith('/'):
+        await message.reply(strings.CANCEL)
+        return
     phone_token = await client.ask(message.chat.id, strings.PHONETOKEN)
+    if phone_token.text.startswith('/'):
+        await message.reply(strings.CANCEL)
+        return
     if str(phone_token.text).startswith("+"):
         try:
             app = await client_session(message, api_id=apid.text, api_hash=aphash.text)
@@ -42,11 +51,16 @@ async def sessions_make(client, message):
             await message.reply(strings.APIINVALID)
             return
         ans = await client.ask(message.chat.id, strings.PHONECODE)
-
+        if ans.text.startswith('/'):
+            await message.reply(strings.CANCEL)
+            return
         try:
             await app.sign_in(phone_token.text, sent_code.phone_code_hash, ans.text)
         except errors.SessionPasswordNeeded:
             pas = await client.ask(message.chat.id, strings.PASSWORD)
+            if pas.text.startswith('/'):
+                await message.reply(strings.CANCEL)
+                return
             try:
                 await app.check_password(pas.text)
             except Exception as err:

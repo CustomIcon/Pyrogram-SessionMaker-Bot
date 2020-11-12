@@ -18,7 +18,6 @@ class psm(Client):
         plugins = dict(
             root=f"{name}.plugins",
         )
-
         super().__init__(
             name,
             api_id=API_ID,
@@ -34,7 +33,6 @@ class psm(Client):
     async def start(self):
         await super().start()
         print("Bot started. Hi.")
-
     async def stop(self, *args):
         await super().stop()
         print("Bot stopped. Bye.")

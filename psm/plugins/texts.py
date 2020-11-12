@@ -19,6 +19,7 @@ helptext3 = """
 **📖 Help (3 of 3)**
 
 When you are ready you can start with /proceed
+You can also cancel current operation with /start
 """
 
 tiptext1 = """

@@ -1,4 +1,5 @@
 """Client Initial."""
+import pyromod.listen
 import logging
 from configparser import ConfigParser
 from datetime import datetime

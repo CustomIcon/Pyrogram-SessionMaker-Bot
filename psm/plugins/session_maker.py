@@ -1,118 +1,94 @@
-from pyrogram import filters
-from pyrogram import Client
-from pyrogram.errors import FloodWait
-from pyrogram import errors
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ForceReply
+from pyrogram import filters, Client, errors
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyromod import listen
 
 import asyncio
 
 from psm import psm
-from psm.plugins.dictionaries import code_caches, app_ids, app_hashs, passwords
+from psm.strings import strings
 
 
-async def client_session(message):
-    return Client(
-        ":memory:",
-        api_id=int(app_ids[message.from_user.id]),
-        api_hash=str(app_hashs[message.from_user.id]),
-    )
+async def client_session(message, api_id, api_hash):
+    return Client(":memory:", api_id=int(api_id), api_hash=str(api_hash))
 
 
-@psm.on_message(filters.command("phone"))
-async def phone_number(_, message):
-    try:
-        app = await client_session(message)
-    except KeyError:
-        await message.reply("You did not set Variables correctly, read /start again.")
-        return
-    try:
-        phonenum = message.text.split(None, 1)[1].replace(" ", "")
-    except IndexError:
-        await message.reply("Must pass args, example: `/phone +1234578900`")
-        return
-    try:
-        await app.connect()
-    except ConnectionError:
-        await app.disconnect()
-        await app.connect()
-    try:
-        sent_code = await app.send_code(phonenum)
-    except FloodWait as e:
-        await message.reply(
-            f"I cannot create session for you.\nYou have a floodwait of: `{e.x} seconds`"
-        )
-        return
-    except errors.exceptions.bad_request_400.PhoneNumberInvalid:
-        await message.reply(
-            "Phone number is invalid, Make sure you double check before sending."
-        )
-        return
-    await message.reply(
-        "send me your code in 25 seconds, make sure you reply to this message and wait for a response.",
-        reply_markup=ForceReply(True),
-    )
-    await asyncio.sleep(25)
-    try:
-        await app.sign_in(
-            phonenum, sent_code.phone_code_hash, code_caches[message.from_user.id]
-        )
-    except KeyError:
-        await message.reply("Timed out, Try again.")
-        return
-    except errors.exceptions.unauthorized_401.SessionPasswordNeeded:
+@psm.on_message(filters.command("proceed") | ~filters.command("start"))
+async def sessions_make(client, message):
+    apid = await client.ask(message.chat.id, strings.APIID)
+    aphash = await client.ask(message.chat.id, strings.APIHASH)
+    phone_token = await client.ask(message.chat.id, strings.PHONETOKEN)
+    if str(phone_token.text).startswith("+"):
         try:
-            await app.check_password(passwords[message.from_user.id])
-        except KeyError:
+            app = await client_session(message, api_id=apid.text, api_hash=aphash.text)
+        except Exception as err:
+            await message.reply(strings.ERROR.format(err=err))
+            return
+        try:
+            await app.connect()
+        except ConnectionError:
+            await app.disconnect()
+            await app.connect()
+        try:
+            sent_code = await app.send_code(phone_token.text)
+        except errors.FloodWait as e:
             await message.reply(
-                "You have not set your password in the `/variables`, try doing that before you continue"
+                f"I cannot create session for you.\nYou have a floodwait of: `{e.x} seconds`"
             )
             return
-    except errors.exceptions.bad_request_400.PhoneCodeInvalid:
-        await message.reply("The code you sent seems Invalid, Try again.")
-        return
-    except errors.exceptions.bad_request_400.PhoneCodeExpired:
-        await message.reply("The Code you sent seems Expired. Try again.")
-        return
-    await app.send_message("me", f"```{(await app.export_session_string())}```")
-    button = InlineKeyboardMarkup(
-        [
+        except errors.PhoneNumberInvalid:
+            await message.reply(strings.INVALIDNUMBER)
+            return
+        except errors.ApiIdInvalid:
+            await message.reply(strings.APIINVALID)
+            return
+        ans = await client.ask(message.chat.id, strings.PHONECODE)
+
+        try:
+            await app.sign_in(phone_token.text, sent_code.phone_code_hash, ans.text)
+        except errors.SessionPasswordNeeded:
+            pas = await client.ask(message.chat.id, strings.PASSWORD)
+            try:
+                await app.check_password(pas.text)
+            except Exception as err:
+                await message.reply(strings.ERROR.format(err=err))
+                return
+        except errors.PhoneCodeInvalid:
+            await message.reply(strings.PHONECODEINVALID)
+            return
+        except errors.PhoneCodeExpired:
+            await message.reply(strings.PHONECODEINVALID)
+            return
+        await app.send_message("me", f"```{(await app.export_session_string())}```")
+        button = InlineKeyboardMarkup(
             [
-                InlineKeyboardButton(
-                    "Go to Saved Messages", url=f"tg://user?id={message.from_user.id}"
-                )
+                [
+                    InlineKeyboardButton(
+                        "Go to Saved Messages",
+                        url=f"tg://user?id={message.from_user.id}",
+                    )
+                ]
             ]
-        ]
-    )
-    await message.reply(
-        "All Done! Check your Saved Messages for your Session String.\n\nMake sure you run /clear to clear caches of your variables",
-        reply_markup=button,
-    )
-
-
-@psm.on_message(filters.command("token"))
-async def bot_token(_, message):
-    try:
-        app = await client_session(message)
-    except KeyError:
-        await message.reply("You did not set Variables correctly, read /start again.")
-        return
-    try:
-        bottoken = message.text.split(None, 1)[1].replace(" ", "")
-    except IndexError:
-        await message.reply("Must pass args, example: `/token 1234:ABCD1234`")
-        return
-    try:
-        await app.connect()
-    except ConnectionError:
-        await app.disconnect()
-        await app.connect()
-    try:
-        await app.sign_in_bot(bottoken)
-    except errors.exceptions.bad_request_400.AccessTokenInvalid:
-        await message.reply(
-            "BotToken Invalid: make sure you are sending a valid BotToken from @BotFather"
         )
-        return
-    await message.reply(
-        f"**Here is your Bot Session:**\n```{(await app.export_session_string())}```\n\nMake sure you run /clear to clear caches of your variables"
-    )
+        await message.reply(
+            strings.DONEPHONE,
+            reply_markup=button,
+        )
+    else:
+        try:
+            app = await client_session(message, api_id=apid.text, api_hash=aphash.text)
+        except Exception as err:
+            await message.reply(strings.ERROR.format(err=err))
+            return
+        try:
+            await app.connect()
+        except ConnectionError:
+            await app.disconnect()
+            await app.connect()
+        try:
+            await app.sign_in_bot(phone_token.text)
+        except errors.AccessTokenInvalid:
+            await message.reply(strings.BOTTOKENINVALID)
+            return
+        await message.reply(
+            f"**Here is your Bot Session:**\n```{(await app.export_session_string())}```\n\nHappy pyrogramming"
+        )

@@ -44,10 +44,10 @@ async def sessions_make(client, message):
                 f"I cannot create session for you.\nYou have a floodwait of: `{e.x} seconds`"
             )
             return
-        except errors.PhoneNumberInvalid:
+        except errors.exceptions.bad_request_400.PhoneNumberInvalid:
             await message.reply(strings.INVALIDNUMBER)
             return
-        except errors.ApiIdInvalid:
+        except errors.exceptions.bad_request_400.ApiIdInvalid:
             await message.reply(strings.APIINVALID)
             return
         ans = await client.ask(message.chat.id, strings.PHONECODE)
@@ -100,7 +100,7 @@ async def sessions_make(client, message):
             await app.connect()
         try:
             await app.sign_in_bot(phone_token.text)
-        except errors.AccessTokenInvalid:
+        except errors.exceptions.bad_request_400.AccessTokenInvalid:
             await message.reply(strings.BOTTOKENINVALID)
             return
         await message.reply(
